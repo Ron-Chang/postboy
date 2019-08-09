@@ -5,7 +5,7 @@ from postboy import Postboy_window
 
 def app():
     app = QApplication(sys.argv)
-    # app.setWindowIcon(QIcon("IMG/icon.icns"))
+    app.setWindowIcon(QIcon("IMG/logo.icns"))
     postboy = Postboy_window()
     sys.exit(app.exec_())
 
