@@ -27,35 +27,11 @@ class Postboy_window(QtWidgets.QWidget,Ui_postboy):
         # Mac fn + delete
         self.pushButton_delete.setShortcut("Ctrl+D")
 
-    def get_timestamp():
-        return int(time.mktime(datetime.datetime.now().timetuple()))
-
-    def execute(self, request):
-
-        cmd = ["curl","-X"]+request
-        cmd = " ".join([i for i in cmd])
-        response = os.popen(cmd).read()
-        self.textEdit_response.setText(response)
-
-    # user interact
-    def post(self):
-        #METHOD
-        self.label_method.setText("[POST]")
-        method = ["POST"]
-
         # URI
-        if self.lineEdit_domain.text():
-            uri = [f"{self.lineEdit_domain.text()}{self.lineEdit_route.text()}"]
-        else:
-            uri = []
-            print("ERROR: Invalid URI") # 插入ERROR CODE
+        self.uri = f"{self.lineEdit_domain.text()}{self.lineEdit_route.text()}"
 
         # HEADER
-        if self.lineEdit_token.text():
-            header = ["-H Content-Type:application/json"]
-            header += [f"-H Authorization:{self.lineEdit_token.text()}"]
-        else:
-            header = []
+        self.token = f"-H Authorization:{self.lineEdit_token.text()}"
 
         #BODY
         if self.textEdit_body.toPlainText():
@@ -65,6 +41,31 @@ class Postboy_window(QtWidgets.QWidget,Ui_postboy):
         else:
             body = []
             print("ERROR")
+
+    @staticmethod
+    def get_timestamp():
+        return int(time.mktime(datetime.datetime.now().timetuple()))
+
+
+
+    def _exec(self, method="GET", route, header, body):
+
+        head_type = ["-H Content-Type:application/json"]
+
+        if is route:
+            print("FILL THE DOMAIN!")
+        else:
+            cmd = ["curl","-X"]+request
+            cmd = " ".join([i for i in cmd])
+            response = os.popen(cmd).read()
+            self.textEdit_response.setText(response)
+
+    # user interact
+    def post(self):
+        #METHOD
+        self.label_method.setText("[POST]")
+        method = ["POST"]
+
 
 
     def get(self):
