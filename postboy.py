@@ -46,13 +46,16 @@ class Postboy_window(QtWidgets.QWidget,Ui_postboy):
     def get_timestamp():
         return int(time.mktime(datetime.datetime.now().timetuple()))
 
+    @staticmethod
+    def get_data():
 
+        pass
 
     def _exec(self, method="GET", route, header, body):
 
         head_type = ["-H Content-Type:application/json"]
 
-        if is route:
+        if route:
             print("FILL THE DOMAIN!")
         else:
             cmd = ["curl","-X"]+request
@@ -153,6 +156,6 @@ class Postboy_window(QtWidgets.QWidget,Ui_postboy):
                 print("ERROR")
 
 
-# if __name__ == "__main__":
-#     import main
-#     main.app()
+if __name__ == "__main__":
+    import main
+    main.app()
