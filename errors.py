@@ -26,3 +26,13 @@ class NotFoundError(BaseError):
         self.error_key = ErrorCodeDefine.get_error_key(self.error_code)
         self.error_msg = ErrorCodeDefine.get_error_msg(self.error_code)
 
+class ValidationError(BaseError):
+    def __init__(self, message='Invalid Filed', error_code=ErrorCodeDefine.BASE_ERROR):
+        BaseError.__init__(self)
+        self.code = 400
+        self.message = message
+        self.status = 'INVALID_FIELD'
+        self.error_code = error_code
+        self.error_key = ErrorCodeDefine.get_error_key(self.error_code)
+        self.error_msg = ErrorCodeDefine.get_error_msg(self.error_code)
+

@@ -7,6 +7,7 @@ class ErrorCodeDefine:
     INVALID_TOKEN = 101  # 無效的token
     TOKEN_EXPIRED = 102  # token已過期
     USER_NOT_EXIST = 103  # 帳號不存在
+    INVALID_DOMAIN = 200 # 無效網域
 
     @staticmethod
     def get_error_key(error_code):
@@ -25,5 +26,6 @@ class ErrorCodeDefine:
             cls.INVALID_TOKEN: 'Invalid Token',  # 無效的token
             cls.TOKEN_EXPIRED: 'Token Expired',  # token已過期
             cls.USER_NOT_EXIST: 'This account is not exist',  # 帳號不存在
+            cls.INVALID_DOMAIN: 'Invalid domain value',  # 無效網域
         }
         return input_dict[error_code]
