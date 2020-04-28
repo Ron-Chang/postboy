@@ -1,6 +1,6 @@
 .DS_Store
 __pycache__
 .idea/
-exam.py
+dist/
+build/
 img/postboy.psd
-img/postboy.png

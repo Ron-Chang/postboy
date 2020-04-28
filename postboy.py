@@ -1,10 +1,9 @@
 import os
+import json
 import time
-from ast import literal_eval
+import requests
 import datetime
-from errors import NotFoundError, ValidationError
-from error_code import ErrorCodeDefine
-from PyQt5 import QtWidgets,QtCore
+from PyQt5 import QtWidgets, QtCore
 from postboy_ui import Ui_postboy
 
 class Postboy_window(QtWidgets.QWidget,Ui_postboy):
@@ -14,6 +13,8 @@ class Postboy_window(QtWidgets.QWidget,Ui_postboy):
         self.setupUi(self)
         self.show()
 
+        self.url = str()
+
         # buttons event
         self.pushButton_post.clicked.connect(self.post)
         self.pushButton_get.clicked.connect(self.get)
@@ -21,91 +22,84 @@ class Postboy_window(QtWidgets.QWidget,Ui_postboy):
         self.pushButton_delete.clicked.connect(self.delete)
 
         # 設定快捷鍵
-        self.pushButton_post.setShortcut("Ctrl+Return")  # Mac Command + retrun
-        self.pushButton_get.setShortcut("Meta+Return")  # Mac retrun
-        self.pushButton_put.setShortcut("Ctrl+R")  # Mac Command + r
-        self.pushButton_delete.setShortcut("Ctrl+D")  # Mac fn + delete
+        self.pushButton_post.setShortcut('Ctrl+Return')  # Mac Command + retrun
+        self.pushButton_get.setShortcut('Meta+Return')  # Mac retrun
+        self.pushButton_put.setShortcut('Ctrl+R')  # Mac Command + r
+        self.pushButton_delete.setShortcut('Ctrl+D')  # Mac fn + delete
 
-    # @staticmethod
-    def _get_timestamp(self):
-        return int(time.mktime(datetime.datetime.now().timetuple()))
+    def _get_params(self):
+        params = self.lineEdit_params.text()
+        if params.startswith('{') and params.endswith('}'):
+            return json.loads(params)
+        if params.startswith('?'):
+            param_list = params.lstrip('?').split('&')
+            results = dict()
+            for param in param_list:
+                attr = param.split('=')
+                if len(attr) != 2:
+                    continue
+                results.update({attr[0]: attr[1]})
+            if 'token' not in results:
+                results.update({'token': self.lineEdit_token.text() or None})
+            return results
+        return dict()
 
-    def _get_data(self, method):
+    def _get_url(self):
+        url = self.lineEdit_url.text()
+        if not url:
+            return url
+        return url if url.startswith('https://') else f'https://{url}'
 
-        #METHOD
-        self.method = f"-X {method}"
-        # URI
-        if self.lineEdit_domain.text():
-            self.uri = f"{self.lineEdit_domain.text()}{self.lineEdit_route.text()}?t={str(self._get_timestamp())}"
-        else:
-            self.uri = ""
-            print("INVALID DOMAIN!")
-        # HEADER
-        if self.lineEdit_token.text():
-            self.header = "-H Content-Type:application/json "
-            self.header += f"-H Authorization:{self.lineEdit_token.text()}"
-        else:
-            self.header = ""
-            print("INVALID TOKEN!")
-        #BODY
-        if self.textEdit_body.toPlainText():
-            self.body = f"-d '{self.textEdit_body.toPlainText()}'"
-        else:
-            self.body = ""
-
-        data = {"method":self.method,
-                "uri":self.uri,
-                "header":self.header,
-                "body":self.body,
-                }
-
-        self._exec(data)
-
-    def _exec(self, data):
-
-        if data["uri"]:
-            data_list = [d for d in list(data.values()) if d != ""]
-            requests = ["curl"]
-            requests += data_list
-            cmd = " ".join([request for request in requests])
-            response = os.popen(cmd).read()
-            self.textEdit_response.setText(response)
-            if data["method"] == "-X POST" and "login" in data["uri"]:
-                try:
-                    token = literal_eval(response)["data"]["session"]
-                    self.lineEdit_token.setText(token)
-                except:
-                    print("ERROR")
-        else:
-            print("NO DOMAIN")
+    def _display_response(self, response):
+        if not response.text:
+            return None
+        try:
+            data = json.loads(response.text)
+            result = json.dumps(data, sort_keys=True, indent=2, ensure_ascii=False)
+        except Exception as e:
+            result = str(e)
+        self.textEdit_response.setText(result)
 
     # user interact
-    def post(self):
-        #METHOD
-        self.label_method.setText("[POST]")
-        method = "POST"
-        self._get_data(method)
-
     def get(self):
-        #METHOD
-        self.label_method.setText("[GET]")
-        method = "GET"
-        self._get_data(method)
+        self.label_method.setText('[GET]')
+        url = self._get_url()
+        if not url:
+            return None
+        params = self._get_params()
+        response = requests.get(url, params=params)
+        if response.status_code != requests.codes.ok:
+            return None
+        self._display_response(response)
+
+    def post(self):
+        self.label_method.setText('[POST]')
+        url = self._get_url()
+        if not url:
+            return None
+        params = self._get_params()
+        payload = self.textEdit_payload.toPlainText()
+        if not payload:
+            response = requests.post(url, params=params)
+        else:
+            try:
+                data = json.loads(payload)
+            except Exception as e:
+                print(f'{e}, {payload}')
+                data = None
+            response = requests.post(url, params=params, data=data)
+        if response.status_code != requests.codes.ok:
+            return None
+        self._display_response(response)
 
     def put(self):
-        #METHOD
-        self.label_method.setText("[PUT]")
-        method = "PUT"
-        self._get_data(method)
+        self.label_method.setText('[PUT]')
 
     def delete(self):
         choice = QtWidgets.QMessageBox.question(
-                    self, "DELETE",
-                    "DELETE",
+                    self, 'DELETE', 'DELETE',
                     QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.No)
 
         if choice == QtWidgets.QMessageBox.Yes:
-            #METHOD
-            self.label_method.setText("[DELETE]")
-            method = "DELETE"
-            self._get_data(method)
+            self.label_method.setText('[DELETE]')
+

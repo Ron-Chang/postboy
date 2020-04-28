@@ -101,7 +101,7 @@
        <number>5</number>
       </property>
       <item>
-       <widget class="QFrame" name="frame_domain">
+       <widget class="QFrame" name="frame_url">
         <property name="frameShape">
          <enum>QFrame::StyledPanel</enum>
         </property>
@@ -127,18 +127,22 @@
          <item>
           <widget class="QLabel" name="label_domain">
            <property name="text">
-            <string>DOMAIN</string>
+            <string>URL</string>
            </property>
           </widget>
          </item>
          <item>
-          <widget class="QLineEdit" name="lineEdit_domain"/>
+          <widget class="QLineEdit" name="lineEdit_url">
+           <property name="text">
+            <string/>
+           </property>
+          </widget>
          </item>
         </layout>
        </widget>
       </item>
       <item>
-       <widget class="QFrame" name="frame_route">
+       <widget class="QFrame" name="frame_params">
         <property name="frameShape">
          <enum>QFrame::StyledPanel</enum>
         </property>
@@ -164,12 +168,12 @@
          <item>
           <widget class="QLabel" name="label_route">
            <property name="text">
-            <string>ROUTE</string>
+            <string>PARAMS</string>
            </property>
           </widget>
          </item>
          <item>
-          <widget class="QLineEdit" name="lineEdit_route"/>
+          <widget class="QLineEdit" name="lineEdit_params"/>
          </item>
         </layout>
        </widget>
@@ -212,12 +216,12 @@
        </widget>
       </item>
       <item>
-       <widget class="QLabel" name="label_body">
+       <widget class="QLabel" name="label_payload">
         <property name="layoutDirection">
          <enum>Qt::LeftToRight</enum>
         </property>
         <property name="text">
-         <string>BODY</string>
+         <string>PAYLOAD</string>
         </property>
         <property name="alignment">
          <set>Qt::AlignCenter</set>
@@ -225,7 +229,7 @@
        </widget>
       </item>
       <item>
-       <widget class="QTextEdit" name="textEdit_body">
+       <widget class="QTextEdit" name="textEdit_payload">
         <property name="cursor" stdset="0">
          <cursorShape>IBeamCursor</cursorShape>
         </property>
